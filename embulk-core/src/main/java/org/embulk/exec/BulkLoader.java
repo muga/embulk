@@ -1,6 +1,7 @@
 package org.embulk.exec;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -16,6 +17,9 @@ import org.embulk.config.TaskSource;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
 import org.embulk.plugin.PluginType;
+import org.embulk.spi.EmbulkLogger;
+import org.embulk.spi.EmbulkLoggers;
+import org.embulk.spi.LoggerPlugin;
 import org.embulk.spi.Schema;
 import org.embulk.spi.Exec;
 import org.embulk.spi.ExecSession;
@@ -443,6 +447,8 @@ public class BulkLoader
         private final OutputPlugin outputPlugin;
         private final List<FilterPlugin> filterPlugins;
 
+        private final EmbulkLogger inputEmbulkLogger;
+
         public ProcessPluginSet(BulkLoaderTask task)
         {
             this.inputPluginType = task.getInputConfig().get(PluginType.class, "type");
@@ -451,6 +457,8 @@ public class BulkLoader
             this.inputPlugin = Exec.newPlugin(InputPlugin.class, inputPluginType);
             this.outputPlugin = Exec.newPlugin(OutputPlugin.class, outputPluginType);
             this.filterPlugins = Filters.newFilterPlugins(Exec.session(), filterPluginTypes);
+
+            this.inputEmbulkLogger = EmbulkLoggers.newEmbulkLogger(Exec.session(), task.getInputConfig());
         }
 
         public PluginType getInputPluginType()
@@ -481,6 +489,11 @@ public class BulkLoader
         public List<FilterPlugin> getFilterPlugins()
         {
             return filterPlugins;
+        }
+
+        public EmbulkLogger getInputEmbulkLogger()
+        {
+            return inputEmbulkLogger;
         }
     }
 
@@ -521,6 +534,9 @@ public class BulkLoader
 
         final ExecutorPlugin exec = newExecutorPlugin(task);
         final ProcessPluginSet plugins = new ProcessPluginSet(task);
+
+        System.out.println("# MN  plugin embulk logger: " + plugins.getInputEmbulkLogger());
+        Exec.session().setInputEmbulkLogger(plugins.getInputEmbulkLogger());
 
         final LoaderState state = newLoaderState(Exec.getLogger(BulkLoader.class), plugins);
         state.setTransactionStage(TransactionStage.INPUT_BEGIN);

@@ -24,6 +24,7 @@ import org.embulk.config.ConfigSource;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
 import org.embulk.spi.BufferAllocator;
+import org.embulk.spi.EmbulkLogger;
 import org.embulk.spi.Exec;
 import org.embulk.spi.FileInputPlugin;
 import org.embulk.spi.TransactionalFileInput;
@@ -66,6 +67,8 @@ public class LocalFileInputPlugin
     public ConfigDiff transaction(ConfigSource config, FileInputPlugin.Control control)
     {
         PluginTask task = config.loadConfig(PluginTask.class);
+
+        Exec.session().getInputEmbulkLogger().log(EmbulkLogger.LogType.ERROR_DATA, EmbulkLogger.LogLevel.ERROR, "embulk logger");
 
         // list files recursively
         List<String> files = listFiles(task);

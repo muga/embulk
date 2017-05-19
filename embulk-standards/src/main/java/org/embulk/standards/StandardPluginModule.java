@@ -6,6 +6,7 @@ import com.google.inject.Module;
 import org.embulk.spi.FilterPlugin;
 import org.embulk.spi.FormatterPlugin;
 import org.embulk.spi.InputPlugin;
+import org.embulk.spi.LoggerPlugin;
 import org.embulk.spi.OutputPlugin;
 import org.embulk.spi.ParserPlugin;
 import org.embulk.spi.DecoderPlugin;
@@ -48,6 +49,9 @@ public class StandardPluginModule
         // filter plugins
         registerPluginTo(binder, FilterPlugin.class, "rename", RenameFilterPlugin.class);
         registerPluginTo(binder, FilterPlugin.class, "remove_columns", RemoveColumnsFilterPlugin.class);
+
+        // logger plugins
+        registerPluginTo(binder, LoggerPlugin.class, "stdout", StdoutLoggerPlugin.class);
 
         // default guess plugins
         registerDefaultGuessPluginTo(binder, new PluginType("gzip"));

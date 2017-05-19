@@ -35,6 +35,8 @@ public class ExecSession
 
     private final boolean preview;
 
+    private EmbulkLogger inputEmbulkLogger;
+
     @Deprecated
     public interface SessionTask
             extends Task
@@ -156,6 +158,16 @@ public class ExecSession
     public Logger getLogger(Class<?> name)
     {
         return loggerFactory.getLogger(name.getName());
+    }
+
+    public EmbulkLogger getInputEmbulkLogger()
+    {
+        return inputEmbulkLogger;
+    }
+
+    public void setInputEmbulkLogger(EmbulkLogger inputEmbulkLogger)
+    {
+        this.inputEmbulkLogger = inputEmbulkLogger;
     }
 
     public BufferAllocator getBufferAllocator()
